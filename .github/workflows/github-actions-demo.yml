@@ -17,5 +17,5 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-          ${{secrets.API_KEY}}
+          echo ${{secrets.API_KEY}}
       - run: echo "🍏 This job's status is ${{ job.status }}."
