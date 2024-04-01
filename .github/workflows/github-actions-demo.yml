@@ -1,21 +1,44 @@
-name: GitHub Actions Demo
+name: SYNC
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+env:
+  # Username/email used to commit to Cloud Manager's Git repository
+  USER_NAME: abhinav.aggarwal@anetcorp.com
+  USER_EMAIL: abhinav.aggarwal@anetcorp.com
+  # Directory within the Cloud Manager Git repository
+  PROJECT_DIR: Practice
+  # Cloud Manager's Git repository
+  MAIN_REPOSITORY: https://${{secrets.BITBUCKET_USER}}:${{secrets.BITBUCKET_PASSWORD}@bitbucket.org/aurx-aem/aem-genentech-cm-core.git
+  # The branch in Cloud Manager's Git repository to push to
+  MAIN_BRANCH : master
 on: 
   push:
     branches: [ master ]
 jobs:
-  Explore-GitHub-Actions:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - uses: actions/checkout@v2
+        with:
+          path: Practice
+      - name: Clean project
         run: |
-          ls ${{ github.workspace }}
-          echo ${{secrets.API_KEY}}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          git -C Practice log --format="%an : %s" -n 1 > commit.txt
+          rm -rf Practice/.git
+          rm -rf Practice/.github
+      - name: Set git config
+        run: |
+          git config --global credential.helper cache
+          git config --global user.email ${USER_EMAIL}
+          git config --global user.name ${USER_NAME}
+      - name: Checkout main project
+        run:
+          git clone -b ${MAIN_BRANCH} ${MAIN_REPOSITORY} ${MAIN_BRANCH}
+      - name: Move project to main project
+        run: |
+          rm -rf ${MAIN_BRANCH}/${PROJECT_DIR}
+          mv Practice ${MAIN_BRANCH}/${PROJECT_DIR}
+      - name: Commit Changes
+        run: |
+          git -C ${MAIN_BRANCH} add -f ${PROJECT_DIR}
+          git -C ${MAIN_BRANCH} commit -F ../commit.txt
+          git -C ${MAIN_BRANCH} push
