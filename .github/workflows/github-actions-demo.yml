@@ -7,7 +7,7 @@ env:
   # Directory within the Cloud Manager Git repository
   PROJECT_DIR: Practice
   # Cloud Manager's Git repository
-  MAIN_REPOSITORY: https://${{secrets.BITBUCKET_USER}}:${{secrets.BITBUCKET_PASSWORD}@bitbucket.org/aurx-aem/aem-genentech-cm-core.git
+  MAIN_REPOSITORY: https://${{secrets.BITBUCKET_USER}}:${{secrets.BITBUCKET_PASSWORD}}@bitbucket.org/aurx-aem/aem-genentech-cm-core.git
   # The branch in Cloud Manager's Git repository to push to
   MAIN_BRANCH : master
 on: 
